@@ -24,16 +24,17 @@
 ; GRAIN-MERGE-MODE 21
 ; COLOR-ERASE-MODE 22
 
-(define (resize-ris image 
+(define (ris-undefect image 
                     drawable
-                    newwidth
-                    newheight
+                    factor
                     method)
     (let*
         (
             (drawable  (car (gimp-image-active-drawable image)))
             (oldwidth  (car (gimp-image-width image)))
             (oldheight (car (gimp-image-height image)))
+            (newwidth  (* oldwidth factor))
+            (newheight (* oldheight factor))
             (layer-base (car (gimp-layer-copy drawable TRUE)))
             (layer-defect (car (gimp-layer-copy drawable TRUE)))
             (layer-copy (car (gimp-layer-copy drawable TRUE)))
@@ -56,9 +57,7 @@
         (set! layer-defect (car (gimp-image-merge-down image layer-copy EXPAND-AS-NECESSARY)))
         (gimp-layer-set-mode layer-defect GRAIN-EXTRACT-MODE)
         (set! layer-base (car (gimp-image-merge-down image layer-defect EXPAND-AS-NECESSARY)))
-        (gimp-item-set-name layer-base "RIS")
-
-        (gimp-image-scale image newwidth newheight)
+        (gimp-item-set-name layer-base "RISundefect")
 
         (gimp-displays-flush)
         
@@ -66,18 +65,17 @@
     )
 )
 
-(script-fu-register "resize-ris"
-                    "_Resize RIS"
-                    "Resize used RIS (Reverse Interpolate Scale)"
+(script-fu-register "ris-undefect"
+                    "_RIS undefect"
+                    "Undefect based Resize used RIS (Reverse Interpolate Scale)"
                     "zvezdochiot https://github.com/zvezdochiot"
                     "This is free and unencumbered software released into the public domain."
-                    "2025-03-27"
+                    "2025-05-18"
                     "*"
                     SF-IMAGE       "Image"       0
                     SF-DRAWABLE    "Drawable"    0
-                    SF-VALUE       "Width"       "1024"
-                    SF-VALUE       "Height"      "1024"
+                    SF-VALUE       "Factor"      "0.5"
                     SF-ENUM        "Method"      '("InterpolationType" "cubic" "none" "linear" "cubic" "nohalo" "lohalo")
 )
 
-(script-fu-menu-register "resize-ris" "<Image>/Image/Transform")
+(script-fu-menu-register "ris-undefect" "<Image>/Image/Transform")
